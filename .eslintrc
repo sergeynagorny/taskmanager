@@ -1,0 +1,15 @@
+{
+  "extends": "htmlacademy/es6",
+  "env": {
+    "browser": true,
+    "es6": true,
+  },
+  "parserOptions": {
+    "ecmaVersion": 2015,
+    "sourceType": "module"
+  },
+  "plugins": ["import"],
+  "rules": {
+    "no-trailing-spaces": ["error", { "ignoreComments": true }]
+  }
+}
