@@ -1,16 +1,18 @@
+import {createBoardTemplate} from "./view/board.js";
+import {createFilterTemplate} from "./view/filter.js";
+import {createLoadMoreButtonTemplate} from "./view/load-more-button.js";
 import {createSiteMenuTemplate} from "./view/site-menu.js";
 import {createSortTemplate} from "./view/sort.js";
-import {createFilterTemplate} from "./view/filter.js";
-import {createTaskTemplate} from "./view/task.js";
-import {createTaskEditTemplate} from "./view/task-edit.js";
-import {createLoadMoreButtonTemplate} from "./view/load-more-button.js";
-import {createBoardTemplate} from "./view/board.js";
 import {createTaskBoardTemplate} from "./view/task-board.js";
+import {createTaskEditTemplate} from "./view/task-edit.js";
+import {createTaskTemplate} from "./view/task.js";
 import {generateFilters} from "./model/filter.js";
 import {generateTasks} from "./model/task.js";
 
 
-const TASK_COUNT = 22;
+const TASK_COUNT = 32;
+const SHOWING_TASKS_COUNT_ON_START = 8;
+const SHOWING_TASKS_COUNT_BY_BUTTON = 8;
 
 const dataFilters = generateFilters();
 const dataTasks = generateTasks(TASK_COUNT);
@@ -30,7 +32,24 @@ render(boardElement, createSortTemplate());
 render(boardElement, createTaskBoardTemplate());
 const taskListElement = document.querySelector(`.board__tasks`);
 render(taskListElement, createTaskEditTemplate(dataTasks[0]));
-for (let i = 1; i < dataTasks.length; i++) {
-  render(taskListElement, createTaskTemplate(dataTasks[i]));
-}
+
+let showingTasksCount = SHOWING_TASKS_COUNT_ON_START;
+
+dataTasks.slice(1, showingTasksCount)
+  .forEach((task) => render(taskListElement, createTaskTemplate(task)));
+
 render(boardElement, createLoadMoreButtonTemplate());
+
+const loadMoreButton = boardElement.querySelector(`.load-more`);
+
+loadMoreButton.addEventListener(`click`, () => {
+  const prevTasksCount = showingTasksCount;
+  showingTasksCount += SHOWING_TASKS_COUNT_BY_BUTTON;
+
+  dataTasks.slice(prevTasksCount, showingTasksCount)
+    .forEach((task) => render(taskListElement, createTaskTemplate(task)));
+
+  if (showingTasksCount >= dataTasks.length) {
+    loadMoreButton.remove();
+  }
+});
