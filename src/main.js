@@ -9,7 +9,7 @@ import SiteMenuView from "./view/site-menu.js";
 import SortView from "./view/sort.js";
 import {generateTasks} from "./model/task.js";
 import {generateFilters} from "./model/filter.js";
-import {render, RenderPosition} from "./utils.js";
+import {render, replace, remove} from "./utils/render.js";
 
 
 const TASK_COUNT = 32;
@@ -20,11 +20,11 @@ const SHOWING_TASKS_COUNT_BY_BUTTON = 8;
 const renderTask = (taskListElement, task) => {
 
   const replaceTaskToEdit = () => {
-    taskListElement.replaceChild(taskEditView.getElement(), taskView.getElement());
+    replace(taskListElement, taskEditView.getElement(), taskView.getElement());
   };
 
   const replaceEditToTask = () => {
-    taskListElement.replaceChild(taskView.getElement(), taskEditView.getElement());
+    replace(taskListElement, taskView.getElement(), taskEditView.getElement());
   };
 
 
@@ -54,19 +54,19 @@ const renderTask = (taskListElement, task) => {
   });
 
 
-  render(taskListElement, taskView.getElement(), RenderPosition.BEFOREEND);
+  render(taskListElement, taskView);
 };
 
 const renderBoard = (boardView, tasks) => {
   const isAllTasksArchived = tasks.every((task) => task.isArchive);
 
   if (isAllTasksArchived) {
-    render(boardView.getElement(), new NoTasksView().getElement());
+    render(boardView.getElement(), new NoTasksView());
     return;
   }
 
-  render(boardView.getElement(), new SortView().getElement());
-  render(boardView.getElement(), new TasksBoardView().getElement());
+  render(boardView.getElement(), new SortView());
+  render(boardView.getElement(), new TasksBoardView());
 
   const taskListElement = boardView.getElement().querySelector(`.board__tasks`);
 
@@ -77,7 +77,7 @@ const renderBoard = (boardView, tasks) => {
     });
 
   const loadMoreButtonView = new LoadMoreButtonView();
-  render(boardView.getElement(), loadMoreButtonView.getElement());
+  render(boardView.getElement(), loadMoreButtonView);
 
   loadMoreButtonView.getElement().addEventListener(`click`, () => {
     const prevTasksCount = showingTasksCount;
@@ -87,7 +87,7 @@ const renderBoard = (boardView, tasks) => {
       .forEach((task) => renderTask(taskListElement, task));
 
     if (showingTasksCount >= tasks.length) {
-      loadMoreButtonView.getElement().remove();
+      remove(loadMoreButtonView.getElement());
       loadMoreButtonView.removeElement();
     }
   });
@@ -100,9 +100,9 @@ const siteHeaderElement = siteMainElement.querySelector(`.main__control`);
 const tasksData = generateTasks(TASK_COUNT);
 const filtersData = generateFilters();
 
-render(siteHeaderElement, new SiteMenuView().getElement());
-render(siteMainElement, new FilterView(filtersData).getElement());
+render(siteHeaderElement, new SiteMenuView());
+render(siteMainElement, new FilterView(filtersData));
 
 const boardView = new BoardView();
-render(siteMainElement, boardView.getElement());
+render(siteMainElement, boardView);
 renderBoard(boardView, tasksData);
