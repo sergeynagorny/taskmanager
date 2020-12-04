@@ -37,22 +37,20 @@ const renderTask = (taskListElement, task) => {
     }
   };
 
-
   const taskView = new TaskView(task);
-  const editButton = taskView.getElement().querySelector(`.card__btn--edit`);
-  editButton.addEventListener(`click`, () => {
+  const taskEditView = new TaskEditView(task);
+
+
+  taskView.setEditButtonClickHandler(() => {
     replaceTaskToEdit();
     document.addEventListener(`keydown`, onEscKeyDown);
   });
 
-  const taskEditView = new TaskEditView(task);
-  const editForm = taskEditView.getElement().querySelector(`form`);
-  editForm.addEventListener(`submit`, (evt) => {
+  taskEditView.setSubmitHandler((evt) => {
     evt.preventDefault();
     replaceEditToTask();
     document.removeEventListener(`keydown`, onEscKeyDown);
   });
-
 
   render(taskListElement, taskView);
 };
