@@ -96,5 +96,8 @@ export default class Board {
       }
     });
 
+    this._sortView.setSortTypeChangeHandler(() => {
+
+    });
   }
 }
