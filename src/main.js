@@ -20,11 +20,11 @@ const SHOWING_TASKS_COUNT_BY_BUTTON = 8;
 const renderTask = (taskListElement, task) => {
 
   const replaceTaskToEdit = () => {
-    replace(taskListElement, taskEditView.getElement(), taskView.getElement());
+    replace(taskEditView, taskView);
   };
 
   const replaceEditToTask = () => {
-    replace(taskListElement, taskView.getElement(), taskEditView.getElement());
+    replace(taskView, taskEditView);
   };
 
 
