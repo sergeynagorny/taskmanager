@@ -49,50 +49,52 @@ const renderTask = (taskListElement, task) => {
   render(taskListElement, taskView);
 };
 
-const renderBoard = (boardView, tasks) => {
-  const isAllTasksArchived = tasks.every((task) => task.isArchive);
-
-  if (isAllTasksArchived) {
-    render(boardView.getElement(), new NoTasksView());
-    return;
-  }
-
-  render(boardView.getElement(), new SortView());
-  render(boardView.getElement(), new TasksBoardView());
-
-  const taskListElement = boardView.getElement().querySelector(`.board__tasks`);
-
-  let showingTasksCount = SHOWING_TASKS_COUNT_ON_START;
-  tasks.slice(0, showingTasksCount)
-    .forEach((task) => {
-      renderTask(taskListElement, task);
-    });
-
-  const loadMoreButtonView = new LoadMoreButtonView();
-  render(boardView.getElement(), loadMoreButtonView);
-
-  loadMoreButtonView.setClickHandler(() => {
-    const prevTasksCount = showingTasksCount;
-    showingTasksCount = showingTasksCount + SHOWING_TASKS_COUNT_BY_BUTTON;
-
-    tasks.slice(prevTasksCount, showingTasksCount)
-      .forEach((task) => renderTask(taskListElement, task));
-
-    if (showingTasksCount >= tasks.length) {
-      remove(loadMoreButtonView.getElement());
-      loadMoreButtonView.removeElement();
-    }
-  });
-
-};
-
 
 export default class Board {
   constructor(container) {
     this._container = container;
+
+    this._noTasksView = new NoTasksView();
+    this._sortView = new SortView();
+    this._tasksBoardView = new TasksBoardView();
+    this._loadMoreButtonView = new LoadMoreButtonView();
   }
 
   render(tasks) {
-    renderBoard(this._container, tasks);
+    const container = this._container.getElement();
+    const isAllTasksArchived = tasks.every((task) => task.isArchive);
+
+    if (isAllTasksArchived) {
+      render(container, this._noTasksView);
+      return;
+    }
+
+
+    render(container, this._sortView);
+    render(container, this._tasksBoardView);
+
+
+    const taskListElement = this._tasksBoardView.getElement();
+    let showingTasksCount = SHOWING_TASKS_COUNT_ON_START;
+    tasks.slice(0, showingTasksCount).forEach((task) => {
+      renderTask(taskListElement, task);
+    });
+
+
+    render(container, this._loadMoreButtonView);
+
+    this._loadMoreButtonView.setClickHandler(() => {
+      const prevTasksCount = showingTasksCount;
+      showingTasksCount = showingTasksCount + SHOWING_TASKS_COUNT_BY_BUTTON;
+
+      tasks.slice(prevTasksCount, showingTasksCount).forEach((task) => {
+        renderTask(taskListElement, task);
+      });
+
+      if (showingTasksCount >= tasks.length) {
+        remove(this._loadMoreButtonComponent);
+      }
+    });
+
   }
 }
