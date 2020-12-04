@@ -79,7 +79,7 @@ const renderBoard = (boardView, tasks) => {
   const loadMoreButtonView = new LoadMoreButtonView();
   render(boardView.getElement(), loadMoreButtonView);
 
-  loadMoreButtonView.getElement().addEventListener(`click`, () => {
+  loadMoreButtonView.setClickHandler(() => {
     const prevTasksCount = showingTasksCount;
     showingTasksCount = showingTasksCount + SHOWING_TASKS_COUNT_BY_BUTTON;
 
