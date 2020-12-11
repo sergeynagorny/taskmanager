@@ -20,7 +20,8 @@ const createSortTemplate = () => {
 export default class Sort extends Abstract {
   constructor() {
     super();
-    this._currenSortType = SortType.DEFAULT;
+
+    this._currentSortType = SortType.DEFAULT;
   }
 
   getTemplate() {
@@ -28,26 +29,22 @@ export default class Sort extends Abstract {
   }
 
   getSortType() {
-    return this._currenSortType;
+    return this._currentSortType;
   }
 
-  setSortTypeChangeHandler(handler) {
-    this.getElement().addEventListener(`click`, (evt) => {
-      evt.preventDefault();
+  setSortTypeChangeHandler(callback) {
+    const sortButtons = this.getElement().querySelectorAll(`.board__filter`);
 
-      if (evt.target.tagName !== `A`) {
-        return;
-      }
+    sortButtons.forEach((it) => {
+      it.addEventListener(`click`, (evt) => {
+        evt.preventDefault();
+        const sortType = evt.target.dataset.sortType;
 
-      const sortType = evt.target.dataset.sortType;
-
-      if (this._currenSortType === sortType) {
-        return;
-      }
-
-      this._currenSortType = sortType;
-
-      handler(this._currenSortType);
+        if (sortType !== this._currentSortType) {
+          this._currentSortType = sortType;
+          callback(this._currentSortType);
+        }
+      });
     });
   }
 }

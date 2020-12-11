@@ -49,9 +49,9 @@ const renderTask = (taskListElement, task) => {
   render(taskListElement, taskView);
 };
 
-const renderTasks = (taskListElement, tasks) => {
+const renderTasks = (container, tasks) => {
   tasks.forEach((task) => {
-    renderTask(taskListElement, task);
+    renderTask(container, task);
   });
 };
 
@@ -123,17 +123,15 @@ export default class Board {
     renderTasks(taskListElement, tasks.slice(0, showingTasksCount));
     renderLoadMoreButton();
 
-
     this._sortView.setSortTypeChangeHandler((sortType) => {
       showingTasksCount = SHOWING_TASKS_COUNT_BY_BUTTON;
-
-      const sortedTasks = getSortedTasks(tasks, sortType, 0, showingTasksCount);
-
       taskListElement.innerHTML = ``;
 
+      const sortedTasks = getSortedTasks(tasks, sortType, 0, showingTasksCount);
       renderTasks(taskListElement, sortedTasks);
 
       renderLoadMoreButton();
     });
+
   }
 }

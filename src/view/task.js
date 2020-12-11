@@ -73,7 +73,6 @@ export default class Task extends Abstract {
   }
 
   setEditButtonClickHandler(handler) {
-    this.getElement().querySelector(`.card__btn--edit`)
-      .addEventListener(`click`, handler);
+    this.getElement().querySelector(`.card__btn--edit`).addEventListener(`click`, handler);
   }
 }
