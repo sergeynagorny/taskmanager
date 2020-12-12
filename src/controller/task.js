@@ -22,6 +22,14 @@ export default class Task {
       document.addEventListener(`keydown`, this._onEscKeyDown);
     });
 
+    this._taskView.setFavoritesButtonClickHandler(() => {
+
+    });
+
+    this._taskView.setArchiveButtonClickHandler(() => {
+
+    });
+
     this._taskEditView.setSubmitHandler((evt) => {
       evt.preventDefault();
       this._replaceEditToTask();
