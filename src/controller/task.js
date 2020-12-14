@@ -2,18 +2,28 @@ import TaskView from "../view/task.js";
 import TaskEditView from "../view/task-edit.js";
 import {render, replace} from "../utils/render.js";
 
+const Mode = {
+  DEFAULT: `default`,
+  EDIT: `edit`,
+};
 
 export default class Task {
-  constructor(container) {
+  constructor(container, onDataChange, onViewChange) {
     this._container = container;
 
     this._taskView = null;
     this._taskEditView = null;
 
+    this._onViewChange = onViewChange;
+    this._mode = Mode.DEFAULT;
+    this._onDataChange = onDataChange;
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
   }
 
   render(task) {
+    const oldTaskView = this._taskView;
+    const oldTaskEditView = this._taskEditView;
+
     this._taskView = new TaskView(task);
     this._taskEditView = new TaskEditView(task);
 
@@ -23,11 +33,15 @@ export default class Task {
     });
 
     this._taskView.setFavoritesButtonClickHandler(() => {
-
+      this._onDataChange(task, Object.assign({}, task, {
+        isFavorite: !task.isFavorite,
+      }));
     });
 
     this._taskView.setArchiveButtonClickHandler(() => {
-
+      this._onDataChange(task, Object.assign({}, task, {
+        isArchive: !task.isArchive,
+      }));
     });
 
     this._taskEditView.setSubmitHandler((evt) => {
@@ -36,15 +50,31 @@ export default class Task {
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     });
 
-    render(this._container, this._taskView);
+    if (oldTaskEditView && oldTaskView) {
+      replace(this._taskView, oldTaskView);
+      replace(this._taskEditView, oldTaskEditView);
+    } else {
+      render(this._container, this._taskView);
+    }
+  }
+
+  setDefaultView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._replaceEditToTask();
+    }
   }
 
   _replaceTaskToEdit() {
+    this._onViewChange();
     replace(this._taskEditView, this._taskView);
+    this._mode = Mode.EDIT;
   }
 
   _replaceEditToTask() {
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
+    this._taskEditView.reset();
     replace(this._taskView, this._taskEditView);
+    this._mode = Mode.DEFAULT;
   }
 
   _onEscKeyDown(evt) {
