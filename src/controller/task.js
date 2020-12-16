@@ -11,6 +11,7 @@ export default class Task {
   constructor(container, onDataChange, onViewChange) {
     this._container = container;
 
+    this._id = null;
     this._taskView = null;
     this._taskEditView = null;
 
@@ -24,6 +25,7 @@ export default class Task {
     const oldTaskView = this._taskView;
     const oldTaskEditView = this._taskEditView;
 
+    this._id = task.id;
     this._taskView = new TaskView(task);
     this._taskEditView = new TaskEditView(task);
 

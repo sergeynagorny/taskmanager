@@ -110,11 +110,10 @@ export default class Board {
   }
 
   _onDataChange(oldData, newData) {
-    const index = this._tasksModel.getTasks().findIndex((it) => it === oldData);
     const isSuccess = this._tasksModel.updateTask(oldData.id, newData);
 
     if (isSuccess) {
-      this._showedTaskControllers[index].render(newData);
+      this._showedTaskControllers.find((it) => it._id === oldData.id).render(newData);
     }
   }
 
