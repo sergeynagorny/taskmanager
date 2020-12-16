@@ -2,8 +2,8 @@ import BoardView from "./view/board.js";
 import BoardController from "./controller/board.js";
 import FilterView from "./view/filter.js";
 import SiteMenuView from "./view/site-menu.js";
-import {generateTasks} from "./model/task.js";
-import {generateFilters} from "./model/filter.js";
+import {generateTasks} from "./mock/task.js";
+import {generateFilters} from "./mock/filter.js";
 import {render} from "./utils/render.js";
 
 
