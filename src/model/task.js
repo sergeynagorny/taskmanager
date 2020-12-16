@@ -1,66 +1,38 @@
-import {COLORS} from "../const.js";
+export default class Tasks {
+  constructor() {
+    this._tasks = [];
 
-const DescriptionItems = [
-  `Learn JavaScript`,
-  `Read book`,
-  `Do 10 push-ups`,
-];
+    this._dataChangeHandlers = [];
+  }
 
-const DefaultRepeatingDays = {
-  "mo": false,
-  "tu": false,
-  "we": false,
-  "th": false,
-  "fr": false,
-  "sa": false,
-  "su": false,
-};
+  getTasks() {
+    return this._tasks;
+  }
 
-const getRandomArrayItem = (array) => {
-  const randomIndex = getRandomIntegerNumber(0, array.length);
+  setTasks(tasks) {
+    this._tasks = Array.from(tasks);
+    this._callHandlers(this._dataChangeHandlers);
+  }
 
-  return array[randomIndex];
-};
+  updateTask(id, task) {
+    const index = this._tasks.findIndex((it) => it.id === id);
 
-const getRandomIntegerNumber = (min, max) => {
-  return min + Math.floor(Math.random() * (max - min));
-};
+    if (index === -1) {
+      return false;
+    }
 
-const getRandomBoolean = () => {
-  return Boolean(Math.random() > 0.5);
-};
+    this._tasks = [].concat(this._tasks.slice(0, index), task, this._tasks.slice(index + 1));
 
-const getRandomDate = () => {
-  const targetDate = new Date();
-  const sign = Math.random() > 0.5 ? 1 : -1;
-  const diffValue = sign * getRandomIntegerNumber(0, 8);
+    this._callHandlers(this._dataChangeHandlers);
 
-  targetDate.setDate(targetDate.getDate() + diffValue);
+    return true;
+  }
 
-  return targetDate;
-};
+  setDataChangeHandler(handler) {
+    this._dataChangeHandlers.push(handler);
+  }
 
-const generateRepeatingDays = () => {
-  return Object.assign({}, DefaultRepeatingDays, {
-    "mo": getRandomBoolean(),
-  });
-};
-
-const generateTask = () => {
-  const dueDate = getRandomBoolean() ? null : getRandomDate();
-
-  return {
-    description: getRandomArrayItem(DescriptionItems),
-    dueDate,
-    repeatingDays: dueDate ? DefaultRepeatingDays : generateRepeatingDays(),
-    color: getRandomArrayItem(COLORS),
-    isArchive: getRandomBoolean(),
-    isFavorite: getRandomBoolean(),
-  };
-};
-
-const generateTasks = (count) => {
-  return new Array(count).fill(``).map(generateTask);
-};
-
-export {generateTasks};
+  _callHandlers(handlers) {
+    handlers.forEach((handler) => handler());
+  }
+}
