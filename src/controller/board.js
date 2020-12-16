@@ -37,10 +37,10 @@ const getSortedTasks = (tasks, sortType, from, to) => {
 };
 
 export default class Board {
-  constructor(container) {
+  constructor(container, tasksModel) {
     this._container = container;
+    this._tasksModel = tasksModel;
 
-    this._tasks = [];
     this._showedTaskControllers = [];
     this._showingTasksCount = SHOWING_TASKS_COUNT_ON_START;
     this._noTasksView = new NoTasksView();
@@ -56,11 +56,11 @@ export default class Board {
     this._sortView.setSortTypeChangeHandler(this._onSortTypeChange);
   }
 
-  render(tasks) {
-    this._tasks = tasks;
-
+  render() {
     const container = this._container.getElement();
-    const isAllTasksArchived = this._tasks.every((task) => task.isArchive);
+    const tasks = this._tasksModel.getTasks();
+
+    const isAllTasksArchived = tasks.every((task) => task.isArchive);
 
     if (isAllTasksArchived) {
       render(container, this._noTasksView);
@@ -70,16 +70,23 @@ export default class Board {
     render(container, this._sortView);
     render(container, this._tasksBoardView);
 
-    const taskListElement = this._tasksBoardView.getElement();
-
-    const newTasks = renderTasks(taskListElement, this._tasks.slice(0, this._showingTasksCount), this._onDataChange, this._onViewChange);
-    this._showedTaskControllers = this._showedTaskControllers.concat(newTasks);
+    this._renderTasks(tasks.slice(0, this._showingTasksCount));
 
     this._renderLoadMoreButton();
   }
 
+  _renderTasks(tasks) {
+    const taskListElement = this._tasksBoardView.getElement();
+
+    const newTasks = renderTasks(taskListElement, tasks, this._onDataChange, this._onViewChange);
+    this._showedTaskControllers = this._showedTaskControllers.concat(newTasks);
+    this._showingTasksCount = this._showedTaskControllers.length;
+  }
+
   _renderLoadMoreButton() {
-    if (this._showingTasksCount >= this._tasks.length) {
+    remove(this._loadMoreButtonView);
+
+    if (this._showingTasksCount >= this._tasksModel.getTasks().length) {
       return;
     }
 
@@ -87,26 +94,27 @@ export default class Board {
     render(container, this._loadMoreButtonView);
 
     this._loadMoreButtonView.setClickHandler(() => {
+      const tasks = this._tasksModel.getTasks();
       const prevTasksCount = this._showingTasksCount;
       const taskListElement = this._tasksBoardView.getElement();
       this._showingTasksCount = this._showingTasksCount + SHOWING_TASKS_COUNT_BY_BUTTON;
 
-      const sortedTasks = getSortedTasks(this._tasks, this._sortView.getSortType(), prevTasksCount, this._showingTasksCount);
+      const sortedTasks = getSortedTasks(tasks, this._sortView.getSortType(), prevTasksCount, this._showingTasksCount);
       const newTasks = renderTasks(taskListElement, sortedTasks, this._onDataChange, this._onViewChange);
       this._showedTaskControllers = this._showedTaskControllers.concat(newTasks);
 
-      if (this._showingTasksCount >= this._tasks.length) {
+      if (this._showingTasksCount >= this._tasksModel.getTasks().length) {
         remove(this._loadMoreButtonView);
       }
     });
   }
 
   _onDataChange(oldData, newData) {
-    const index = this._tasks.findIndex((it) => it === oldData);
+    const index = this._tasksModel.getTasks().findIndex((it) => it === oldData);
+    const isSuccess = this._tasksModel.updateTask(oldData.id, newData);
 
-    if (index >= 0) {
-      this._tasks = [].concat(this._tasks.slice(0, index), newData, this._tasks.slice(index + 1));
-      this._showedTaskControllers[index].render(this._tasks[index]);
+    if (isSuccess) {
+      this._showedTaskControllers[index].render(newData);
     }
   }
 
@@ -117,7 +125,7 @@ export default class Board {
   _onSortTypeChange(sortType) {
     this._showingTasksCount = SHOWING_TASKS_COUNT_BY_BUTTON;
 
-    const sortedTasks = getSortedTasks(this._tasks, sortType, 0, this._showingTasksCount);
+    const sortedTasks = getSortedTasks(this._tasksModel.getTasks(), sortType, 0, this._showingTasksCount);
     const taskListElement = this._tasksBoardView.getElement();
 
     taskListElement.innerHTML = ``;
