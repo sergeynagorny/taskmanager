@@ -23,11 +23,12 @@ export default class Task {
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
   }
 
-  render(task) {
+  render(task, mode) {
     const oldTaskView = this._taskView;
     const oldTaskEditView = this._taskEditView;
 
     this._id = task.id;
+    this._mode = mode;
     this._taskView = new TaskView(task);
     this._taskEditView = new TaskEditView(task);
 
@@ -50,13 +51,16 @@ export default class Task {
 
     this._taskEditView.setSubmitHandler((evt) => {
       evt.preventDefault();
-      this._replaceEditToTask();
-      document.removeEventListener(`keydown`, this._onEscKeyDown);
+      const data = this._taskEditView.getData();
+      this._onDataChange(task, data);
     });
+
+    this._taskEditView.setDeleteButtonClickHandler(() => this._onDataChange(task, null));
 
     if (oldTaskEditView && oldTaskView) {
       replace(this._taskView, oldTaskView);
       replace(this._taskEditView, oldTaskEditView);
+      this._replaceEditToTask();
     } else {
       render(this._container, this._taskView);
     }
@@ -83,7 +87,11 @@ export default class Task {
   _replaceEditToTask() {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
     this._taskEditView.reset();
-    replace(this._taskView, this._taskEditView);
+
+    if (document.contains(this._taskEditView.getElement())) {
+      replace(this._taskView, this._taskEditView);
+    }
+
     this._mode = Mode.DEFAULT;
   }
 
