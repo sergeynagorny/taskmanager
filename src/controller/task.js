@@ -1,13 +1,30 @@
 import TaskView from "../view/task.js";
 import TaskEditView from "../view/task-edit.js";
 import {render, remove, replace} from "../utils/render.js";
+import {Color} from "../const.js";
 
 export const Mode = {
+  ADDING: `adding`,
   DEFAULT: `default`,
   EDIT: `edit`,
 };
 
-export const EmptyTask = {};
+export const EmptyTask = {
+  description: ``,
+  dueDate: null,
+  repeatingDays: {
+    "mo": false,
+    "tu": false,
+    "we": false,
+    "th": false,
+    "fr": false,
+    "sa": false,
+    "su": false,
+  },
+  color: Color.BLACK,
+  isFavorite: false,
+  isArchive: false,
+};
 
 export default class Task {
   constructor(container, onDataChange, onViewChange) {
@@ -57,12 +74,26 @@ export default class Task {
 
     this._taskEditView.setDeleteButtonClickHandler(() => this._onDataChange(task, null));
 
-    if (oldTaskEditView && oldTaskView) {
-      replace(this._taskView, oldTaskView);
-      replace(this._taskEditView, oldTaskEditView);
-      this._replaceEditToTask();
-    } else {
-      render(this._container, this._taskView);
+
+    switch (mode) {
+      case Mode.DEFAULT:
+        if (oldTaskEditView && oldTaskView) {
+          replace(this._taskView, oldTaskView);
+          replace(this._taskEditView, oldTaskEditView);
+          this._replaceEditToTask();
+        } else {
+          render(this._container, this._taskView);
+        }
+        break;
+
+      case Mode.ADDING:
+        if (oldTaskEditView && oldTaskView) {
+          remove(oldTaskEditView);
+          remove(oldTaskView);
+        }
+        document.addEventListener(`keydown`, this._onEscKeyDown);
+        render(this._container, this._taskEditComponent, `afterbegin`);
+        break;
     }
   }
 
@@ -99,6 +130,10 @@ export default class Task {
     const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
 
     if (isEscKey) {
+      if (this._mode === Mode.ADDING) {
+        this._onDataChange(EmptyTask, null);
+      }
+
       this._replaceEditToTask();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     }

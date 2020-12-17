@@ -47,6 +47,7 @@ export default class Board {
     this._sortView = new SortView();
     this._tasksBoardView = new TasksBoardView();
     this._loadMoreButtonView = new LoadMoreButtonView();
+    this._creatingTask = null;
 
 
     this._onDataChange = this._onDataChange.bind(this);
@@ -76,6 +77,16 @@ export default class Board {
     this._renderTasks(tasks.slice(0, this._showingTasksCount));
 
     this._renderLoadMoreButton();
+  }
+
+  createTask() {
+    if (this._creatingTask) {
+      return;
+    }
+
+    const taskListElement = this._tasksView.getElement();
+    this._creatingTask = new TaskController(taskListElement, this._onDataChange, this._onViewChange);
+    this._creatingTask.render(EmptyTask, TaskControllerMode.ADDING);
   }
 
   _removeTasks() {
