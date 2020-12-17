@@ -83,12 +83,6 @@ export default class Board {
     if (this._creatingTask) {
       return;
     }
-
-    // const taskListElement = this._tasksBoardView.getElement();
-    // this._creatingTask = new TaskController(taskListElement, this._onDataChange, this._onViewChange);
-    // this._showedTaskControllers = this._showedTaskControllers.concat(this._creatingTask);
-    // this._creatingTask.render(EmptyTask, TaskControllerMode.ADDING);
-
     const taskListElement = this._tasksBoardView.getElement();
     this._creatingTask = new TaskController(taskListElement, this._onDataChange, this._onViewChange);
     this._showedTaskControllers = [].concat(this._creatingTask, this._showedTaskControllers);
@@ -141,27 +135,24 @@ export default class Board {
     this._renderLoadMoreButton();
   }
 
-  _onDataChange(oldData, newData) {
-
-    console.log(oldData, newData);
-
+  _onDataChange(taskController, oldData, newData) {
     if (oldData === EmptyTask) {
       this._creatingTask = null;
 
       if (newData === null) {
-        this._showedTaskControllers.find((it) => it._id === null).destroy();
+        taskController.destroy();
         this._updateTasks(this._showingTasksCount);
+
       } else {
-
         this._tasksModel.addTask(newData);
-        const currentTaskController = this._showedTaskControllers.find((it) => it._mode === TaskControllerMode.ADDING);
-        currentTaskController.render(newData, TaskControllerMode.DEFAULT);
+        taskController.render(newData, TaskControllerMode.DEFAULT);
 
-        // if (this._showingTasksCount % SHOWING_TASKS_COUNT_BY_BUTTON === 0) {
-        //   const destroyedTask = this._showedTaskControllers.pop();
-        //   destroyedTask.destroy();
-        // }
+        if (this._showingTasksCount % SHOWING_TASKS_COUNT_BY_BUTTON === 0) {
+          const destroyedTask = this._showedTaskControllers.pop();
+          destroyedTask.destroy();
+        }
 
+        this._showedTaskControllers = [].concat(taskController, this._showedTaskControllers);
         this._showingTasksCount = this._showedTaskControllers.length;
 
         this._renderLoadMoreButton();
@@ -169,11 +160,10 @@ export default class Board {
     } else if (newData === null) {
       this._tasksModel.removeTask(oldData.id);
       this._updateTasks(this._showingTasksCount);
-
     } else {
       const isSuccess = this._tasksModel.updateTask(oldData.id, newData);
       if (isSuccess) {
-        this._showedTaskControllers.find((it) => it._id === newData.id).render();
+        taskController.render(newData, TaskControllerMode.DEFAULT);
       }
     }
   }

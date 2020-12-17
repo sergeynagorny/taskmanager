@@ -16,7 +16,7 @@ const createButtonMarkup = (name, isDisabled = false) => {
 const createTaskTemplate = (task) => {
   const {description: notSanitizedDescription, dueDate, color, repeatingDays, isArchive, isFavorite} = task;
 
-  const isExpired = dueDate instanceof Date && isOverdueDate(dueDate < new Date());
+  const isExpired = dueDate instanceof Date && isOverdueDate(dueDate, new Date());
   const isDateShowing = !!dueDate;
 
   const date = isDateShowing ? `${dueDate.getDate()} ${MONTH_NAMES[dueDate.getMonth()]}` : ``;

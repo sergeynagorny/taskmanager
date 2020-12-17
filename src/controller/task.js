@@ -30,7 +30,6 @@ export default class Task {
   constructor(container, onDataChange, onViewChange) {
     this._container = container;
 
-    this._id = null;
     this._taskView = null;
     this._taskEditView = null;
 
@@ -44,7 +43,6 @@ export default class Task {
     const oldTaskView = this._taskView;
     const oldTaskEditView = this._taskEditView;
 
-    this._id = task.id;
     this._mode = mode;
     this._taskView = new TaskView(task);
     this._taskEditView = new TaskEditView(task);
@@ -55,13 +53,13 @@ export default class Task {
     });
 
     this._taskView.setFavoritesButtonClickHandler(() => {
-      this._onDataChange(task, Object.assign({}, task, {
+      this._onDataChange(this, task, Object.assign({}, task, {
         isFavorite: !task.isFavorite,
       }));
     });
 
     this._taskView.setArchiveButtonClickHandler(() => {
-      this._onDataChange(task, Object.assign({}, task, {
+      this._onDataChange(this, task, Object.assign({}, task, {
         isArchive: !task.isArchive,
       }));
     });
@@ -69,10 +67,10 @@ export default class Task {
     this._taskEditView.setSubmitHandler((evt) => {
       evt.preventDefault();
       const data = this._taskEditView.getData();
-      this._onDataChange(task, data);
+      this._onDataChange(this, task, data);
     });
 
-    this._taskEditView.setDeleteButtonClickHandler(() => this._onDataChange(task, null));
+    this._taskEditView.setDeleteButtonClickHandler(() => this._onDataChange(this, task, null));
 
 
     switch (mode) {
@@ -131,7 +129,7 @@ export default class Task {
 
     if (isEscKey) {
       if (this._mode === Mode.ADDING) {
-        this._onDataChange(EmptyTask, null);
+        this._onDataChange(this, EmptyTask, null);
       }
 
       this._replaceEditToTask();
