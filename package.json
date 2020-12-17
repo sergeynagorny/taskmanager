@@ -26,6 +26,7 @@
     "node": "10"
   },
   "dependencies": {
+    "dayjs": "^1.9.7",
     "flatpickr": "^4.6.6"
   }
 }
