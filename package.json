@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "dayjs": "^1.9.7",
-    "flatpickr": "^4.6.6"
+    "flatpickr": "^4.6.6",
+    "he": "^1.2.0"
   }
 }

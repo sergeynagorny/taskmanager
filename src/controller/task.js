@@ -92,7 +92,7 @@ export default class Task {
           remove(oldTaskView);
         }
         document.addEventListener(`keydown`, this._onEscKeyDown);
-        render(this._container, this._taskEditComponent, `afterbegin`);
+        render(this._container, this._taskEditView, `afterbegin`);
         break;
     }
   }

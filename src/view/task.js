@@ -2,6 +2,8 @@ import Abstract from "./abstract.js";
 import {MONTH_NAMES} from "../const.js";
 import {formatTime} from "../utils/common.js";
 import {isOverdueDate} from "../utils/common.js";
+import {encode} from "he";
+
 
 const createButtonMarkup = (name, isDisabled = false) => {
   return (`
@@ -12,13 +14,14 @@ const createButtonMarkup = (name, isDisabled = false) => {
 };
 
 const createTaskTemplate = (task) => {
-  const {description, dueDate, color, repeatingDays, isArchive, isFavorite} = task;
+  const {description: notSanitizedDescription, dueDate, color, repeatingDays, isArchive, isFavorite} = task;
 
   const isExpired = dueDate instanceof Date && isOverdueDate(dueDate < new Date());
   const isDateShowing = !!dueDate;
 
   const date = isDateShowing ? `${dueDate.getDate()} ${MONTH_NAMES[dueDate.getMonth()]}` : ``;
   const time = isDateShowing ? formatTime(dueDate) : ``;
+  const description = encode(notSanitizedDescription);
 
   const repeatClass = Object.values(repeatingDays).some(Boolean) ? `card--repeat` : ``;
   const deadlineClass = isExpired ? `card--deadline` : ``;
