@@ -1,6 +1,11 @@
 import Abstract from "./abstract.js";
 
 
+const getFilterNameById = (id) => {
+  const FILTER_ID_PREFIX = `filter__`;
+  return id.substring(FILTER_ID_PREFIX.length);
+};
+
 const createFilterMarkup = (filter, isChecked) => {
   const {name, count} = filter;
 
@@ -11,7 +16,7 @@ const createFilterMarkup = (filter, isChecked) => {
 };
 
 const createFilterTemplate = (filters) => {
-  const filtersMarkup = filters.map((it, i) => createFilterMarkup(it, i === 0)).join(`\n`);
+  const filtersMarkup = filters.map((it) => createFilterMarkup(it, it.checked)).join(`\n`);
 
   return (`
     <section class="main__filter filter container">
@@ -29,5 +34,12 @@ export default class Filter extends Abstract {
 
   getTemplate() {
     return createFilterTemplate(this._filters);
+  }
+
+  setFilterChangeHandler(handler) {
+    this.getElement().addEventListener(`change`, (evt) => {
+      const filterName = getFilterNameById(evt.target.id);
+      handler(filterName);
+    });
   }
 }
