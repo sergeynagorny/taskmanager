@@ -193,7 +193,7 @@ const createStatisticsTemplate = ({tasks, dateFrom, dateTo}) => {
       <div class="statistic__line">
         <div class="statistic__period">
           <h2 class="statistic__period-title">Task Activity DIAGRAM</h2>
-          <div class="statistic-input-wrap">
+          <div class="statistic-input-wrap" style="display: none;">
             <input class="statistic__period-input" type="text" placeholder="${placeholder}">
           </div>
           <p class="statistic__period-result">
