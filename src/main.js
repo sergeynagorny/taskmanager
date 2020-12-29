@@ -1,30 +1,14 @@
 import BoardView from "./view/board.js";
 import BoardController from "./controller/board.js";
 import FilterController from "./controller/filter.js";
+
 import SiteMenuView, {MenuItem} from "./view/site-menu.js";
-import TasksModel from "./model/tasks.js";
 import StatisticsView from "./view/statistics.js";
+import TasksModel from "./model/tasks.js";
 import {generateTasks} from "./mock/task.js";
 import {render} from "./utils/render.js";
 
-const TASK_COUNT = 40;
-
-const siteMainElement = document.querySelector(`.main`);
-const siteHeaderElement = siteMainElement.querySelector(`.main__control`);
-const siteMenuView = new SiteMenuView();
-render(siteHeaderElement, siteMenuView);
-
-const tasksData = generateTasks(TASK_COUNT);
-const tasksModel = new TasksModel();
-tasksModel.setTasks(tasksData);
-
-const filterController = new FilterController(siteMainElement, tasksModel);
-filterController.render();
-
-const boardView = new BoardView();
-render(siteMainElement, boardView);
-const boardController = new BoardController(boardView, tasksModel);
-boardController.render();
+const TASK_COUNT = 22;
 
 const dateTo = new Date();
 const dateFrom = (() => {
@@ -32,7 +16,27 @@ const dateFrom = (() => {
   d.setDate(d.getDate() - 7);
   return d;
 })();
+
+const tasksData = generateTasks(TASK_COUNT);
+const tasksModel = new TasksModel();
+
+tasksModel.setTasks(tasksData);
+
+const siteMainElement = document.querySelector(`.main`);
+const siteHeaderElement = siteMainElement.querySelector(`.main__control`);
+const siteMenuView = new SiteMenuView();
 const statisticsView = new StatisticsView({tasks: tasksModel, dateFrom, dateTo});
+
+const boardView = new BoardView();
+
+const boardController = new BoardController(boardView, tasksModel);
+const filterController = new FilterController(siteMainElement, tasksModel);
+
+render(siteHeaderElement, siteMenuView);
+filterController.render();
+render(siteMainElement, boardView);
+boardController.render();
+
 render(siteMainElement, statisticsView);
 statisticsView.hide();
 
