@@ -95,10 +95,21 @@ export default class Task {
       const formData = this._taskEditView.getData();
       const data = parseFormData(formData);
 
+      this._taskEditView.setData({
+        saveButtonText: `Saving...`,
+      });
+
       this._onDataChange(this, task, data);
     });
 
-    this._taskEditView.setDeleteButtonClickHandler(() => this._onDataChange(this, task, null));
+    this._taskEditView.setDeleteButtonClickHandler(() => {
+
+      this._taskEditView.setData({
+        deleteButtonText: `Deleting...`,
+      });
+
+      this._onDataChange(this, task, null);
+    });
 
 
     switch (mode) {
@@ -142,6 +153,12 @@ export default class Task {
     setTimeout(() => {
       this._taskEditView.getElement().style.animation = ``;
       this._taskView.getElement().style.animation = ``;
+
+      this._taskEditView.setData({
+        saveButtonText: `Save`,
+        deleteButtonText: `Delete`,
+      });
+
     }, SHAKE_ANIMATION_TIMEOUT);
   }
 
