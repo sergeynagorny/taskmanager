@@ -1,12 +1,33 @@
 import TaskView from "../view/task.js";
 import TaskEditView from "../view/task-edit.js";
+import TaskModel from "../model/task.js";
 import {render, remove, replace} from "../utils/render.js";
-import {Color} from "../const.js";
+import {Color, DAYS} from "../const.js";
 
 export const Mode = {
   ADDING: `adding`,
   DEFAULT: `default`,
   EDIT: `edit`,
+};
+
+const parseFormData = (formData) => {
+  const date = formData.get(`date`);
+  const repeatingDays = DAYS.reduce((acc, day) => {
+    acc[day] = false;
+    return acc;
+  }, {});
+
+  return new TaskModel({
+    "description": formData.get(`text`),
+    "due_date": date ? new Date(date) : null,
+    "repeating_days": formData.getAll(`repeat`).reduce((acc, it) => {
+      acc[it] = true;
+      return acc;
+    }, repeatingDays),
+    "color": formData.get(`color`),
+    "is_favorite": false,
+    "is_done": false,
+  });
 };
 
 export const EmptyTask = {
@@ -53,20 +74,25 @@ export default class Task {
     });
 
     this._taskView.setFavoritesButtonClickHandler(() => {
-      this._onDataChange(this, task, Object.assign({}, task, {
-        isFavorite: !task.isFavorite,
-      }));
+      const newTask = TaskModel.clone(task);
+      newTask.isFavorite = !newTask.isFavorite;
+
+      this._onDataChange(this, task, newTask);
     });
 
     this._taskView.setArchiveButtonClickHandler(() => {
-      this._onDataChange(this, task, Object.assign({}, task, {
-        isArchive: !task.isArchive,
-      }));
+      const newTask = TaskModel.clone(task);
+      newTask.isArchive = !newTask.isArchive;
+
+      this._onDataChange(this, task, newTask);
     });
 
     this._taskEditView.setSubmitHandler((evt) => {
       evt.preventDefault();
-      const data = this._taskEditView.getData();
+
+      const formData = this._taskEditView.getData();
+      const data = parseFormData(formData);
+
       this._onDataChange(this, task, data);
     });
 

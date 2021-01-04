@@ -8,7 +8,7 @@ import StatisticsView from "./view/statistics.js";
 import TasksModel from "./model/tasks.js";
 import {render} from "./utils/render.js";
 
-const AUTHORIZATION = `Basic ASddasr21=`;
+const AUTHORIZATION = `Basic Asdhjasdj22`;
 
 const dateTo = new Date();
 const dateFrom = (() => {
@@ -27,7 +27,7 @@ const statisticsView = new StatisticsView({tasks: tasksModel, dateFrom, dateTo})
 
 const boardView = new BoardView();
 
-const boardController = new BoardController(boardView, tasksModel);
+const boardController = new BoardController(boardView, tasksModel, api);
 const filterController = new FilterController(siteMainElement, tasksModel);
 
 render(siteHeaderElement, siteMenuView);
