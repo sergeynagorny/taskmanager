@@ -4,6 +4,8 @@ import TaskModel from "../model/task.js";
 import {render, remove, replace} from "../utils/render.js";
 import {Color, DAYS} from "../const.js";
 
+const SHAKE_ANIMATION_TIMEOUT = 600;
+
 export const Mode = {
   ADDING: `adding`,
   DEFAULT: `default`,
@@ -131,6 +133,16 @@ export default class Task {
     remove(this._taskEditView);
     remove(this._taskView);
     document.removeEventListener(`keydown`, this._onEscKeyDown);
+  }
+
+  shake() {
+    this._taskEditView.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    this._taskView.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      this._taskEditView.getElement().style.animation = ``;
+      this._taskView.getElement().style.animation = ``;
+    }, SHAKE_ANIMATION_TIMEOUT);
   }
 
   _replaceTaskToEdit() {

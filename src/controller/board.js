@@ -153,6 +153,7 @@ export default class Board {
         this._updateTasks(this._showingTasksCount);
 
       } else {
+
         this._api.createTask(newData)
           .then((taskModel) => {
             this._tasksModel.addTask(taskModel);
@@ -167,15 +168,25 @@ export default class Board {
             this._showingTasksCount = this._showedTaskControllers.length;
 
             this._renderLoadMoreButton();
+          })
+          .catch(() => {
+            taskController.shake();
           });
+
       }
     } else if (newData === null) {
+
       this._api.deleteTask(oldData.id)
         .then(() => {
           this._tasksModel.removeTask(oldData.id);
           this._updateTasks(this._showingTasksCount);
+        })
+        .catch(() => {
+          taskController.shake();
         });
+
     } else {
+
       this._api.updateTask(oldData.id, newData)
         .then((taskModel) => {
           const isSuccess = this._tasksModel.updateTask(oldData.id, taskModel);
@@ -184,6 +195,9 @@ export default class Board {
             taskController.render(taskModel, TaskControllerMode.DEFAULT);
             this._updateTasks(this._showingTasksCount);
           }
+        })
+        .catch(() => {
+          taskController.shake();
         });
 
     }
